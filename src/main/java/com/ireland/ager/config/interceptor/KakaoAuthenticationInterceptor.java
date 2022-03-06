@@ -22,6 +22,7 @@ public class KakaoAuthenticationInterceptor implements HandlerInterceptor {
     private final AuthServiceImpl authService;
     private static final String[] excludeList = {
             "/api/account/login-url"
+            ,"/api/account/login-web"
             , "/api/account/login"
             , "/api/account/token/**"
             , "/favicon.ico/**"
@@ -29,7 +30,6 @@ public class KakaoAuthenticationInterceptor implements HandlerInterceptor {
             , "/kafka/*"
             , "/kafka/**"
             , "/socket.io/*"
-            , "/api/popular-keyword"
     };
 
     /**

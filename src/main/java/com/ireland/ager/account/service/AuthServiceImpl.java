@@ -57,7 +57,6 @@ public class AuthServiceImpl {
      * @Parameter : []
      * @Return : String
      **/
-    /*
     public String getKakaoLoginUrl() {
         return new StringBuilder()
                 .append(KAKAO_URL).append("/oauth/authorize?client_id=").append(kakaoRestApiKey)
@@ -65,8 +64,25 @@ public class AuthServiceImpl {
                 .append("&response_type=code")
                 .toString();
     }
-     */
+    public MyAccountResponse getKakaoWebLogin(String code) {
+        HashMap<String, String> kakaoTokens = getKakaoTokens(code);
+        KakaoResponse kakaoResponse = getKakaoUserInfo(kakaoTokens.get("access_token"));
 
+        String accountEmail = kakaoResponse.getKakao_account().getEmail();
+        //TODO 나중에 카카오 인증으로 이메일 필수 동의할 수 있게 하자
+        if (accountEmail == null || accountEmail == "") {
+            accountEmail = String.valueOf(kakaoResponse.getId()) + EMAIL_SUFFIX;
+        }
+        Account accountForCheck = accountService.findAccountByAccountEmail(accountEmail);
+        if (accountForCheck != null) {
+            // 존재한다면 Token 값을 갱신하고 반환한다.
+            return updateTokenWithAccount(accountForCheck.getAccountId(), kakaoTokens.get("access_token"));
+        } else {
+            // 존재하지 않는다면 회원 가입 시키고 반환한다.
+            return accountService.insertAccount(
+                    kakaoResponse.toAccount(kakaoTokens.get("access_token")));
+        }
+    }
     /**
      * @Method : getKakaoLogin
      * @Description : 카카오 로그인
@@ -122,7 +138,6 @@ public class AuthServiceImpl {
      * @Parameter : [code]
      * @Return : HashMap<String, String>
      **/
-    /*
     public HashMap<String, String> getKakaoTokens(String code) {
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
@@ -141,7 +156,6 @@ public class AuthServiceImpl {
 
         return tokenResEntity.getBody();
     }
-     */
 
     /**
      * @Method : getKakaoUserInfo

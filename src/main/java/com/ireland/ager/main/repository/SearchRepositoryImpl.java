@@ -21,7 +21,7 @@ public class SearchRepositoryImpl implements SearchRepositoryCustom{
         List<String> searchJPAQuery = queryFactory
                 .select(search.keyword)
                 .from(search)
-                .where(search.createdAt.between(now.minusMinutes(1),now))
+                .where(search.createdAt.between(now.minusDays(1),now))
                 .groupBy(search.keyword)
                 .orderBy(search.keyword.count().desc())
                 .limit(5)

@@ -42,13 +42,21 @@ public class AccountController {
      * @Parameter : []
      * @Return : ResponseEntity<SingleResult<String>>
      **/
-
-    /*
     @GetMapping("/login-url")
     public ResponseEntity<SingleResult<String>> loginUrl() {
         return new ResponseEntity<>(responseService.getSingleResult(authService.getKakaoLoginUrl()), HttpStatus.OK);
     }
-    */
+
+    /**
+     * @Method : getTokenAndJoinOrLogin
+     * @Description : 회원가입 또는 로그인
+     * @Parameter : [code]
+     * @Return : ResponseEntity<SingleResult<MyAccountResponse>>
+     **/
+    @GetMapping("/login-web")
+    public ResponseEntity<SingleResult<MyAccountResponse>> getTokenAndWebJoinOrLogin(@RequestParam("code") String code) {
+        return new ResponseEntity<>(responseService.getSingleResult(authService.getKakaoWebLogin(code)), HttpStatus.CREATED);
+    }
 
     /**
      * @Method : getTokenAndJoinOrLogin

@@ -32,6 +32,6 @@ public class Search extends BaseEntity implements Serializable {
     private String keyword;
 
     public Search(String keyword) {
-        super();
+        this.keyword=keyword;
     }
 }

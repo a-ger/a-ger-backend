@@ -62,8 +62,11 @@ public class ProductServiceImpl {
      * @Return : Slice<ProductThumbResponse>
      **/
     public Slice<ProductThumbResponse> findProductAllByCreatedAtDesc(Category category, String keyword, Pageable pageable) {
-        if(!keyword.isEmpty()) searchRepository.save(new Search(keyword));
+        if(!isStringEmpty(keyword)) searchRepository.save(new Search(keyword));
         return productRepository.findAllProductPageableOrderByCreatedAtDesc(category, keyword, pageable);
+    }
+    boolean isStringEmpty(String str) {
+        return str == null || str.trim().length() == 0;
     }
 
     /**

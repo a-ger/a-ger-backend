@@ -9,6 +9,8 @@ import com.ireland.ager.main.common.CommonResult;
 import com.ireland.ager.main.common.SingleResult;
 import com.ireland.ager.main.common.SliceResult;
 import com.ireland.ager.main.common.service.ResponseService;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -33,7 +35,9 @@ public class MessageRoomController {
      * @Return : ResponseEntity<SliceResult<MessageSummaryResponse>>
      **/
     @GetMapping
+    @ApiOperation(value = "유저별 모든 채팅방 리스트 조회")
     public ResponseEntity<SliceResult<MessageSummaryResponse>> searchAllRoomList(
+            @ApiParam(value = "액세스 토큰", required = true)
             @RequestHeader("Authorization") String accessToken
             , Pageable pageable) {
         String[] splitToken = accessToken.split(" ");
@@ -48,8 +52,11 @@ public class MessageRoomController {
      * @Return : ResponseEntity<SingleResult<MessageDetailsResponse>>
      **/
     @GetMapping("/{roomId}")
+    @ApiOperation(value = "채팅방 입장하기")
     public ResponseEntity<SingleResult<MessageDetailsResponse>> roomEnter(
+            @ApiParam(value = "채팅방 아이디", required = true)
             @PathVariable Long roomId,
+            @ApiParam(value = "액세스 토큰", required = true)
             @RequestHeader("Authorization") String accessToken
     ) {
         String[] splitToken = accessToken.split(" ");
@@ -64,8 +71,11 @@ public class MessageRoomController {
      * @Return : ResponseEntity<SingleResult<RoomCreateResponse>>
      **/
     @PostMapping("/{productId}")
+    @ApiOperation(value = "채팅방 생성")
     public ResponseEntity<SingleResult<RoomCreateResponse>> insertRoom(
+            @ApiParam(value = "등록된 제품 아이디", required = true)
             @PathVariable Long productId,
+            @ApiParam(value = "엑세스 토큰", required = true)
             @RequestHeader("Authorization") String accessToken
     ) {
         String[] splitToken = accessToken.split(" ");
@@ -80,8 +90,11 @@ public class MessageRoomController {
      * @Return : ResponseEntity<CommonResult>
      **/
     @DeleteMapping("/{roomId}")
+    @ApiOperation(value = "채팅방 삭제")
     public ResponseEntity<CommonResult> roomDelete(
+            @ApiParam(value = "채팅방 아이디", required = true)
             @PathVariable Long roomId,
+            @ApiParam(value = "액세스 토큰", required = true)
             @RequestHeader("Authorization") String accessToken
     ) {
         String[] splitToken = accessToken.split(" ");

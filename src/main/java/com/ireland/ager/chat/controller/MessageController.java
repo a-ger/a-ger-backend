@@ -49,9 +49,9 @@ public class MessageController {
     @SendTo("/topic/group/{roomId}")
     @ApiOperation(value = "특정 채딩방 접속")
     public Message broadcastGroupMessage(
-            @ApiParam(value = "채팅방 아이디")
+            @ApiParam(value = "채팅방 아이디", required = true)
             @DestinationVariable Long roomId,
-            @ApiParam(value = "메시지")
+            @ApiParam(value = "메시지", required = true)
             @Payload Message message) {
         return message;
     }

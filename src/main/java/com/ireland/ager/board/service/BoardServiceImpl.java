@@ -57,7 +57,13 @@ public class BoardServiceImpl {
                                     BoardRequest boardRequest,
                                     List<MultipartFile> multipartFile) throws IOException {
         Account account = accountService.findAccountByAccessToken(accessToken);
-        List<String> uploadImagesUrl = uploadService.uploadImages(multipartFile);
+
+        List<String> uploadImagesUrl = new ArrayList<>();
+
+        if(!multipartFile.get(0).isEmpty()) {
+            uploadImagesUrl = uploadService.uploadImages(multipartFile);
+        }
+
         Board newPost = boardRepository.save(BoardRequest.toBoard(boardRequest, account, uploadImagesUrl));
         return BoardResponse.toBoardResponse(newPost, account);
     }
@@ -77,7 +83,7 @@ public class BoardServiceImpl {
         if (!(account.equals(board.getAccountId()))) {
             throw new UnAuthorizedAccessException();
         }
-        validateFileExists(multipartFile);
+//        validateFileExists(multipartFile);
         List<BoardUrl> currentFileImageUrlList = board.getUrlList();
         uploadService.deleteBoard(currentFileImageUrlList);
         board.deleteUrl();

@@ -32,7 +32,7 @@ public class ReviewController {
      * @Return : ResponseEntity<SingleResult<ReviewResponse>>
      **/
     @PostMapping("/{roomId}")
-    @ApiOperation(value = "리퓨 등록")
+    @ApiOperation(value = "리뷰 등록")
     public ResponseEntity<SingleResult<ReviewResponse>> postReview(
             @ApiParam(value = "액세스 토큰", required = true)
             @RequestHeader("Authorization") String accessToken,

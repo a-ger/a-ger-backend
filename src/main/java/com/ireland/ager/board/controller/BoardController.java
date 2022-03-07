@@ -9,6 +9,8 @@ import com.ireland.ager.board.service.BoardServiceImpl;
 import com.ireland.ager.main.common.CommonResult;
 import com.ireland.ager.main.common.SingleResult;
 import com.ireland.ager.main.common.service.ResponseService;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -42,9 +44,13 @@ public class BoardController {
      * @Parameter : [boardId, accessToken]
      * @Return : ResponseEntity<SingleResult<BoardResponse>>
      **/
+    @ApiOperation(value="게시물 조회")
     @GetMapping("/{boardId}")
-    public ResponseEntity<SingleResult<BoardResponse>> findBoardById(@PathVariable Long boardId,
-                                                                     @RequestHeader("Authorization") String accessToken) {
+    public ResponseEntity<SingleResult<BoardResponse>> findBoardById(
+            @ApiParam(value = "boardId", required = true)
+            @PathVariable Long boardId,
+            @ApiParam(value = "액세스 토큰", required = true)
+            @RequestHeader("Authorization") String accessToken) {
 
         String[] splitToken = accessToken.split(" ");
         Account account = accountService.findAccountByAccessToken(splitToken[1]);
@@ -59,12 +65,16 @@ public class BoardController {
      * @Parameter : [accessToken, multipartFile, boardRequest, bindingResult]
      * @Return : ResponseEntity<SingleResult<BoardResponse>>
      **/
+    @ApiOperation(value="게시물 등록")
     @PostMapping
-    public ResponseEntity<SingleResult<BoardResponse>> createPost(@RequestHeader("Authorization") String accessToken,
-                                                                  @RequestPart(value = "file") List<MultipartFile> multipartFile,
-                                                                  @RequestPart(value = "board") @Valid BoardRequest boardRequest,
-                                                                  BindingResult bindingResult) throws IOException {
-
+    public ResponseEntity<SingleResult<BoardResponse>> createPost(
+            @ApiParam(value = "액세스 토큰", required = true)
+            @RequestHeader("Authorization") String accessToken,
+            @ApiParam(value = "게시물 사진", required = false)
+            @RequestPart(value = "file") List<MultipartFile> multipartFile,
+            @ApiParam(value = "게시물 DTO", required = true)
+            @RequestPart(value = "board") @Valid BoardRequest boardRequest,
+            BindingResult bindingResult) throws IOException {
         boardService.validateUploadForm(bindingResult);
         boardService.validateFileExists(multipartFile);
         String[] splitToken = accessToken.split(" ");
@@ -78,11 +88,17 @@ public class BoardController {
      * @Parameter : [accessToken, boardRequest, multipartFile, boardId]
      * @Return : ResponseEntity<SingleResult<BoardResponse>>
      **/
+    @ApiOperation(value="게시물 수정")
     @PatchMapping("/{boardId}")
-    public ResponseEntity<SingleResult<BoardResponse>> updatePost(@RequestHeader("Authorization") String accessToken,
-                                                                  @RequestPart(value = "board") BoardRequest boardRequest,
-                                                                  @RequestPart(value = "file") List<MultipartFile> multipartFile,
-                                                                  @PathVariable(value = "boardId") Long boardId) throws IOException {
+    public ResponseEntity<SingleResult<BoardResponse>> updatePost(
+            @ApiParam(value = "액세스 토큰", required = true)
+            @RequestHeader("Authorization") String accessToken,
+            @ApiParam(value = "게시물 DTO", required = true)
+            @RequestPart(value = "board") BoardRequest boardRequest,
+            @ApiParam(value = "게시물 사진", required = false)
+            @RequestPart(value = "file") List<MultipartFile> multipartFile,
+            @ApiParam(value = "boardId", required = true)
+            @PathVariable(value = "boardId") Long boardId) throws IOException {
         String[] splitToken = accessToken.split(" ");
         BoardResponse boardResponse = boardService.updatePost(splitToken[1], boardId, boardRequest, multipartFile);
         return new ResponseEntity<>(responseService.getSingleResult(boardResponse), HttpStatus.OK);
@@ -94,9 +110,13 @@ public class BoardController {
      * @Parameter : [accessToken, boardId]
      * @Return : ResponseEntity<CommonResult>
      **/
+    @ApiOperation(value="게시물 삭제")
     @DeleteMapping("/{boardId}")
-    public ResponseEntity<CommonResult> deletePost(@RequestHeader("Authorization") String accessToken,
-                                                   @PathVariable(value = "boardId") Long boardId) throws IOException {
+    public ResponseEntity<CommonResult> deletePost(
+            @ApiParam(value = "액세스 토큰", required = true)
+            @RequestHeader("Authorization") String accessToken,
+            @ApiParam(value = "boardId", required = true)
+            @PathVariable(value = "boardId") Long boardId) throws IOException {
         String[] splitToken = accessToken.split(" ");
         boardService.deletePost(splitToken[1], boardId);
         return new ResponseEntity<>(responseService.getSuccessResult(), HttpStatus.OK);

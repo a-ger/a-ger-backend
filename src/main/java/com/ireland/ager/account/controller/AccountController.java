@@ -8,6 +8,9 @@ import com.ireland.ager.account.service.AuthServiceImpl;
 import com.ireland.ager.main.common.CommonResult;
 import com.ireland.ager.main.common.SingleResult;
 import com.ireland.ager.main.common.service.ResponseService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
@@ -42,6 +45,7 @@ public class AccountController {
      * @Parameter : []
      * @Return : ResponseEntity<SingleResult<String>>
      **/
+    @ApiOperation(value="로그인 링크 생성")
     @GetMapping("/login-url")
     public ResponseEntity<SingleResult<String>> loginUrl() {
         return new ResponseEntity<>(responseService.getSingleResult(authService.getKakaoLoginUrl()), HttpStatus.OK);
@@ -53,8 +57,11 @@ public class AccountController {
      * @Parameter : [code]
      * @Return : ResponseEntity<SingleResult<MyAccountResponse>>
      **/
+    @ApiOperation(value="카카오 웹 로그인")
     @GetMapping("/login-web")
-    public ResponseEntity<SingleResult<MyAccountResponse>> getTokenAndWebJoinOrLogin(@RequestParam("code") String code) {
+    public ResponseEntity<SingleResult<MyAccountResponse>> getTokenAndWebJoinOrLogin(
+            @ApiParam(value = "로그인 코드", required = true)
+            @RequestParam("code") String code) {
         return new ResponseEntity<>(responseService.getSingleResult(authService.getKakaoWebLogin(code)), HttpStatus.CREATED);
     }
 
@@ -65,7 +72,10 @@ public class AccountController {
      * @Return : ResponseEntity<SingleResult<MyAccountResponse>>
      **/
     @GetMapping("/login")
-    public ResponseEntity<SingleResult<MyAccountResponse>> getTokenAndJoinOrLogin(@RequestHeader("Authorization") String accessToken) {
+    @ApiOperation(value="카카오 로그인")
+    public ResponseEntity<SingleResult<MyAccountResponse>> getTokenAndJoinOrLogin(
+            @ApiParam(value = "액세스 토큰", required = true)
+            @RequestHeader("Authorization") String accessToken) {
         return new ResponseEntity<>(responseService.getSingleResult(authService.getKakaoLogin(accessToken)), HttpStatus.CREATED);
     }
   
@@ -75,8 +85,11 @@ public class AccountController {
      * @Parameter : [accessToken]
      * @Return : ResponseEntity<CommonResult>
      **/
+    @ApiOperation(value="카카오 로그아웃")
     @GetMapping("/logout")
-    public ResponseEntity<CommonResult> logout(@RequestHeader("Authorization") String accessToken) {
+    public ResponseEntity<CommonResult> logout(
+            @ApiParam(value = "액세스 토큰", required = true)
+            @RequestHeader("Authorization") String accessToken) {
         authService.getKakaoLogout(accessToken);
         return new ResponseEntity<>(responseService.getSuccessResult(), HttpStatus.OK);
     }
@@ -100,8 +113,11 @@ public class AccountController {
      * @Parameter : [accessToken]
      * @Return : ResponseEntity<SingleResult<MyAccountResponse>>
      **/
+    @ApiOperation(value="내 계정 정보 반환")
     @GetMapping
-    public ResponseEntity<SingleResult<MyAccountResponse>> getMyAccount(@RequestHeader("Authorization") String accessToken) {
+    public ResponseEntity<SingleResult<MyAccountResponse>> getMyAccount(
+            @ApiParam(value = "액세스 토큰", required = true)
+            @RequestHeader("Authorization") String accessToken) {
         String[] splitToken = accessToken.split(" ");
         MyAccountResponse myAccountResponse = MyAccountResponse.toAccountResponse(accountService.findAccountByAccessToken(splitToken[1]));
         return new ResponseEntity<>(
@@ -114,12 +130,15 @@ public class AccountController {
      * @Parameter : [accessToken, accountId]
      * @Return : ResponseEntity<SingleResult<OtherAccountResponse>>
      **/
+    @ApiOperation(value="다른 사람 계정 정보 반환")
     @GetMapping("/{accountId}")
     public ResponseEntity<SingleResult<OtherAccountResponse>> getOtherAccount(
+            @ApiParam(value = "액세스 토큰", required = true)
             @RequestHeader("Authorization") String accessToken,
+            @ApiParam(value = "accountId", required = true)
             @PathVariable Long accountId) {
         String[] splitToken = accessToken.split(" ");
-        OtherAccountResponse otherAccountByAccountId = OtherAccountResponse.toOtherAccountResponse(accountService.findAccountByAccessToken(splitToken[1]));
+        OtherAccountResponse otherAccountByAccountId = OtherAccountResponse.toOtherAccountResponse(accountService.findAccountByAccountId(accountId));
         return new ResponseEntity<>(
                 responseService.getSingleResult(otherAccountByAccountId), HttpStatus.OK);
     }
@@ -130,11 +149,16 @@ public class AccountController {
      * @Parameter : [accessToken, accountId, accountUpdateRequest, multipartFile]
      * @Return : ResponseEntity<SingleResult<MyAccountResponse>>
      **/
+    @ApiOperation(value="내 계정 정보 수정")
     @PatchMapping("/{accountId}")
     public ResponseEntity<SingleResult<MyAccountResponse>> updateAccount(
+            @ApiParam(value = "액세스 토큰", required = true)
             @RequestHeader("Authorization") String accessToken,
+            @ApiParam(value = "accountId", required = true)
             @PathVariable Long accountId,
+            @ApiParam(value = "수정할 정보", required = true)
             @RequestPart(value = "update") AccountUpdateRequest accountUpdateRequest,
+            @ApiParam(value = "수정할 사진", required = true)
             @RequestPart(value = "file") MultipartFile multipartFile) throws IOException {
         String[] spitToken = accessToken.split(" ");
         MyAccountResponse myAccountResponse = accountService.updateAccount(spitToken[1], accountId, accountUpdateRequest, multipartFile);
@@ -147,9 +171,12 @@ public class AccountController {
      * @Parameter : [accessToken, accountId]
      * @Return : ResponseEntity<CommonResult>
      **/
+    @ApiOperation(value="내 계정 삭제")
     @DeleteMapping("/{accountId}")
     public ResponseEntity<CommonResult> deleteAccount(
+            @ApiParam(value = "액세스 토큰", required = true)
             @RequestHeader("Authorization") String accessToken,
+            @ApiParam(value = "accountId", required = true)
             @PathVariable Long accountId) {
         String[] splitToken = accessToken.split(" ");
         accountService.deleteAccount(splitToken[1], accountId);

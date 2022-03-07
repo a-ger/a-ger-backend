@@ -56,6 +56,16 @@ public class AccountServiceImpl {
     }
 
     /**
+     * @Method : findAccountByAccountId
+     * @Description : accountId로 계정 조회
+     * @Parameter : [accountId]
+     * @Return : Account
+     **/
+    public Account findAccountByAccountId(Long accountId) {
+        return accountRepository.findById(accountId).orElseThrow(NotFoundException::new);
+    }
+
+    /**
      * @Method : insertAccount
      * @Description : 회원 가입
      * @Parameter : [newAccount]

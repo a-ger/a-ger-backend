@@ -119,6 +119,7 @@ public class AccountController {
             @ApiParam(value = "액세스 토큰", required = true)
             @RequestHeader("Authorization") String accessToken) {
         String[] splitToken = accessToken.split(" ");
+        System.out.println("splitToken = " + splitToken[1]);
         MyAccountResponse myAccountResponse = MyAccountResponse.toAccountResponse(accountService.findAccountByAccessToken(splitToken[1]));
         return new ResponseEntity<>(
                 responseService.getSingleResult(myAccountResponse), HttpStatus.OK);

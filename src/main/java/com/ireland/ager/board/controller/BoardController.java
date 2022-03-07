@@ -71,12 +71,12 @@ public class BoardController {
             @ApiParam(value = "액세스 토큰", required = true)
             @RequestHeader("Authorization") String accessToken,
             @ApiParam(value = "게시물 사진", required = false)
-            @RequestPart(value = "file") List<MultipartFile> multipartFile,
+            @RequestPart(value = "file", required = false) List<MultipartFile> multipartFile,
             @ApiParam(value = "게시물 DTO", required = true)
             @RequestPart(value = "board") @Valid BoardRequest boardRequest,
             BindingResult bindingResult) throws IOException {
         boardService.validateUploadForm(bindingResult);
-        boardService.validateFileExists(multipartFile);
+//        boardService.validateFileExists(multipartFile);
         String[] splitToken = accessToken.split(" ");
         BoardResponse boardResponse = boardService.createPost(splitToken[1], boardRequest, multipartFile);
         return new ResponseEntity<>(responseService.getSingleResult(boardResponse), HttpStatus.CREATED);

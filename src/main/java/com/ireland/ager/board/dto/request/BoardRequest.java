@@ -30,10 +30,12 @@ public class BoardRequest {
     public static Board toBoard(BoardRequest boardRequest, Account account, List<String> uploadImgUrl) {
         Board board = new Board();
 
-        for (String str : uploadImgUrl) {
-            BoardUrl url = new BoardUrl();
-            url.setUrl(str);
-            board.addUrl(url);
+        if (uploadImgUrl.size() > 0) {
+            for (String str : uploadImgUrl) {
+                BoardUrl url = new BoardUrl();
+                url.setUrl(str);
+                board.addUrl(url);
+            }
         }
         board.addAccount(account);
         board.setTitle(boardRequest.getTitle());

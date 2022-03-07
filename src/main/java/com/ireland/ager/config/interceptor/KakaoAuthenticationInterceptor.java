@@ -30,6 +30,12 @@ public class KakaoAuthenticationInterceptor implements HandlerInterceptor {
             , "/kafka/*"
             , "/kafka/**"
             , "/socket.io/*"
+            ,"/swagger-ui/**"
+            ,"/swagger-ui/*"
+            ,"/swagger-resources/*"
+            ,"/swagger-resources/**"
+            ,"/swagger-resources"
+            ,"/v2/api-docs"
     };
 
     /**

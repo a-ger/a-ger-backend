@@ -165,10 +165,12 @@ public class BoardServiceImpl {
      * @Return : Slice<BoardSummaryResponse>
      **/
     public Slice<BoardSummaryResponse> findBoardAllByCreatedAtDesc(String keyword, Pageable pageable) {
-        if(!keyword.isEmpty()) searchRepository.save(new Search(keyword));
+        if(!isStringEmpty(keyword)) searchRepository.save(new Search(keyword));
         return boardRepository.findAllBoardPageableOrderByCreatedAtDesc(keyword, pageable);
     }
-
+    boolean isStringEmpty(String str) {
+        return str == null || str.trim().length() == 0;
+    }
     /**
      * @Method : validateFileExists
      * @Description : 이미지 파일 유효성 검증

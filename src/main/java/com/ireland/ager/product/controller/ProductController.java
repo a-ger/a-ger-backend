@@ -12,6 +12,9 @@ import com.ireland.ager.product.dto.request.ProductRequest;
 import com.ireland.ager.product.dto.request.ProductUpdateRequest;
 import com.ireland.ager.product.dto.response.ProductResponse;
 import com.ireland.ager.product.service.ProductServiceImpl;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -47,8 +50,11 @@ public class ProductController {
      * @Return : ResponseEntity<SingleResult<ProductResponse>>
      **/
     @GetMapping("/{productId}")
+    @ApiOperation(value = "상품 아이디로 상품 조회")
     public ResponseEntity<SingleResult<ProductResponse>> findProductById(
+            @ApiParam(value = "액세스 토큰", required = true)
             @RequestHeader("Authorization") String accessToken,
+            @ApiParam(value = "제품 아이디", required = true)
             @PathVariable Long productId) {
         String[] splitToken = accessToken.split(" ");
         productService.addViewCntToRedis(productId);
@@ -66,9 +72,13 @@ public class ProductController {
      * @Return : ResponseEntity<SingleResult<ProductResponse>>
      **/
     @PostMapping
+    @ApiOperation(value = "제품 등록")
     public ResponseEntity<SingleResult<ProductResponse>> createProduct(
+            @ApiParam(value = "액세스 토큰", required = true)
             @RequestHeader("Authorization") String accessToken,
+            @ApiParam(value = "제품 사진", required = true)
             @RequestPart(value = "file") List<MultipartFile> multipartFile,
+            @ApiParam(value = "제품 정보", required = true)
             @RequestPart(value = "product") @Valid ProductRequest productRequest, BindingResult bindingResult) throws IOException {
 
         productService.validateUploadForm(bindingResult);
@@ -87,10 +97,15 @@ public class ProductController {
      * @Return : ResponseEntity<SingleResult<ProductResponse>>
      **/
     @PatchMapping("/{productId}")
+    @ApiOperation(value = "제품 수정")
     public ResponseEntity<SingleResult<ProductResponse>> updateProduct(
+            @ApiParam(value = "액세스 토큰", required = true)
             @RequestHeader("Authorization") String accessToken,
+            @ApiParam(value = "제품 아이디", required = true)
             @PathVariable Long productId,
+            @ApiParam(value = "제품 사진", required = true)
             @RequestPart(value = "file") List<MultipartFile> multipartFile,
+            @ApiParam(value = "제품 수정 정보", required = true)
             @RequestPart(value = "product") @Valid ProductUpdateRequest productUpdateRequest, BindingResult bindingResult) throws IOException {
         productService.validateUploadForm(bindingResult);
         String[] splitToken = accessToken.split(" ");
@@ -105,8 +120,11 @@ public class ProductController {
      * @Return : ResponseEntity<CommonResult>
      **/
     @DeleteMapping("/{productId}")
+    @ApiOperation(value = "제품 삭제")
     public ResponseEntity<CommonResult> deleteProductById(
+            @ApiParam(value = "액세스 토큰", required = true)
             @RequestHeader("Authorization") String accessToken,
+            @ApiParam(value = "제품 아이디", required = true)
             @PathVariable long productId) {
         String[] splitToken = accessToken.split(" ");
         productService.deleteProductById(productId, splitToken[1]);

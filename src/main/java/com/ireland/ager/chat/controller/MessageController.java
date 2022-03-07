@@ -3,6 +3,8 @@ package com.ireland.ager.chat.controller;
 import com.ireland.ager.chat.dto.request.MessageRequest;
 import com.ireland.ager.chat.entity.Message;
 import com.ireland.ager.chat.service.KafkaProductService;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -30,7 +32,10 @@ public class MessageController {
      * @Return : void
      **/
     @PostMapping(value = "/publish")
-    public void sendMessage(@RequestBody MessageRequest message) {
+    @ApiOperation(value = "메시지 전송")
+    public void sendMessage(
+            @ApiParam(value = "메시지 내용", required = true)
+            @RequestBody MessageRequest message) {
         kafkaProductService.sendMessage(message);
     }
 
@@ -42,7 +47,12 @@ public class MessageController {
      **/
     @MessageMapping("/sendMessage")
     @SendTo("/topic/group/{roomId}")
-    public Message broadcastGroupMessage(@DestinationVariable Long roomId, @Payload Message message) {
+    @ApiOperation(value = "특정 채딩방 접속")
+    public Message broadcastGroupMessage(
+            @ApiParam(value = "채팅방 아이디", required = true)
+            @DestinationVariable Long roomId,
+            @ApiParam(value = "메시지", required = true)
+            @Payload Message message) {
         return message;
     }
 }

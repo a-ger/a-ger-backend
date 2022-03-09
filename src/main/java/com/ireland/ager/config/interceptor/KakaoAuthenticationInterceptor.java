@@ -23,6 +23,8 @@ public class KakaoAuthenticationInterceptor implements HandlerInterceptor {
     private static final String[] excludeList = {
             "/api/account/login-url"
             ,"/api/account/login-web"
+            ,"/api/account/login-web/*"
+            ,"/api/account/login-web/**"
             , "/api/account/login"
             , "/api/account/token/**"
             , "/favicon.ico/**"

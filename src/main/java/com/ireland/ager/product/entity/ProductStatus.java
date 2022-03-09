@@ -1,8 +1,5 @@
 package com.ireland.ager.product.entity;
 
-import lombok.Getter;
-
-@Getter
 public enum ProductStatus {
     SALE("판매중"),
     RESERVATION("예약중"),
@@ -12,6 +9,10 @@ public enum ProductStatus {
 
     ProductStatus(String description) {
         this.description = description;
+    }
+
+    public String getDescription() {
+        return this.description;
     }
 }
 

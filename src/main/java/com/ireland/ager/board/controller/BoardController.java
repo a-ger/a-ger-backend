@@ -71,7 +71,7 @@ public class BoardController {
             @ApiParam(value = "액세스 토큰", required = true)
             @RequestHeader("Authorization") String accessToken,
             @ApiParam(value = "게시물 사진", required = false)
-            @RequestPart(value = "file") List<MultipartFile> multipartFile,
+            @RequestPart(value = "file", required = false) List<MultipartFile> multipartFile,
             @ApiParam(value = "게시물 DTO", required = true)
             @RequestPart(value = "board") @Valid BoardRequest boardRequest,
             BindingResult bindingResult) throws IOException {
@@ -96,7 +96,7 @@ public class BoardController {
             @ApiParam(value = "게시물 DTO", required = true)
             @RequestPart(value = "board") BoardRequest boardRequest,
             @ApiParam(value = "게시물 사진", required = false)
-            @RequestPart(value = "file") List<MultipartFile> multipartFile,
+            @RequestPart(value = "file", required = false) List<MultipartFile> multipartFile,
             @ApiParam(value = "boardId", required = true)
             @PathVariable(value = "boardId") Long boardId) throws IOException {
         String[] splitToken = accessToken.split(" ");

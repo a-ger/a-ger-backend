@@ -1,18 +1,19 @@
 package com.ireland.ager.chat.dto.response;
 
 import com.ireland.ager.chat.entity.MessageRoom;
-import lombok.Builder;
-import lombok.Getter;
 
 /**
  * @Class : MessageDetailsResponse
  * @Description : 메세지도메인에 대한 Response DTO
  **/
-@Getter
-@Builder
 public class MessageDetailsResponse {
     Long roomId;
     String reviewStatus;
+
+    MessageDetailsResponse(Long roomId, String reviewStatus) {
+        this.roomId = roomId;
+        this.reviewStatus = reviewStatus;
+    }
 
     /**
      * @Method : toMessageDetailsResponse
@@ -25,5 +26,43 @@ public class MessageDetailsResponse {
                 .roomId(messageRoom.getRoomId())
                 .reviewStatus(messageRoom.getReviewStatus().name())
                 .build();
+    }
+
+    public static MessageDetailsResponseBuilder builder() {
+        return new MessageDetailsResponseBuilder();
+    }
+
+    public Long getRoomId() {
+        return this.roomId;
+    }
+
+    public String getReviewStatus() {
+        return this.reviewStatus;
+    }
+
+    public static class MessageDetailsResponseBuilder {
+        private Long roomId;
+        private String reviewStatus;
+
+        MessageDetailsResponseBuilder() {
+        }
+
+        public MessageDetailsResponseBuilder roomId(Long roomId) {
+            this.roomId = roomId;
+            return this;
+        }
+
+        public MessageDetailsResponseBuilder reviewStatus(String reviewStatus) {
+            this.reviewStatus = reviewStatus;
+            return this;
+        }
+
+        public MessageDetailsResponse build() {
+            return new MessageDetailsResponse(roomId, reviewStatus);
+        }
+
+        public String toString() {
+            return "MessageDetailsResponse.MessageDetailsResponseBuilder(roomId=" + this.roomId + ", reviewStatus=" + this.reviewStatus + ")";
+        }
     }
 }

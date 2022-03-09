@@ -57,6 +57,7 @@ public class BoardServiceImpl {
                                     BoardRequest boardRequest,
                                     List<MultipartFile> multipartFile) throws IOException {
         Account account = accountService.findAccountByAccessToken(accessToken);
+        System.out.println(multipartFile.size());
         List<String> uploadImagesUrl = uploadService.uploadImages(multipartFile);
         Board newPost = boardRepository.save(BoardRequest.toBoard(boardRequest, account, uploadImagesUrl));
         return BoardResponse.toBoardResponse(newPost, account);

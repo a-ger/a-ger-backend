@@ -1,17 +1,17 @@
 package com.ireland.ager.chat.dto.response;
 
 import com.ireland.ager.chat.entity.MessageRoom;
-import lombok.Builder;
-import lombok.Getter;
 
 /**
  * @Class : RoomCreateResponse
  * @Description : 메세지도메인에 대한 RoomResponse DTO
  **/
-@Getter
-@Builder
 public class RoomCreateResponse {
     Long roomId;
+
+    RoomCreateResponse(Long roomId) {
+        this.roomId = roomId;
+    }
 
     /**
      * @Method : toRoomCreateResponse
@@ -23,5 +23,33 @@ public class RoomCreateResponse {
         return RoomCreateResponse.builder()
                 .roomId(messageRoom.getRoomId())
                 .build();
+    }
+
+    public static RoomCreateResponseBuilder builder() {
+        return new RoomCreateResponseBuilder();
+    }
+
+    public Long getRoomId() {
+        return this.roomId;
+    }
+
+    public static class RoomCreateResponseBuilder {
+        private Long roomId;
+
+        RoomCreateResponseBuilder() {
+        }
+
+        public RoomCreateResponseBuilder roomId(Long roomId) {
+            this.roomId = roomId;
+            return this;
+        }
+
+        public RoomCreateResponse build() {
+            return new RoomCreateResponse(roomId);
+        }
+
+        public String toString() {
+            return "RoomCreateResponse.RoomCreateResponseBuilder(roomId=" + this.roomId + ")";
+        }
     }
 }

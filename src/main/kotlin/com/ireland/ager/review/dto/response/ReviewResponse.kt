@@ -1,0 +1,381 @@
+package com.ireland.ager.review.dto.response
+
+import com.ireland.ager.chat.dto.request.MessageRequest
+import com.ireland.ager.chat.dto.request.MessageRequest.MessageRequestBuilder
+import com.ireland.ager.chat.entity.MessageRoom
+import com.ireland.ager.chat.dto.response.RoomCreateResponse.RoomCreateResponseBuilder
+import com.ireland.ager.chat.dto.response.RoomCreateResponse
+import com.ireland.ager.chat.dto.response.MessageDetailsResponse.MessageDetailsResponseBuilder
+import com.ireland.ager.chat.dto.response.MessageDetailsResponse
+import com.ireland.ager.chat.dto.response.MessageSummaryResponse.MessageSummaryResponseBuilder
+import com.ireland.ager.chat.dto.response.MessageSummaryResponse
+import com.ireland.ager.account.entity.Account
+import org.springframework.kafka.annotation.EnableKafka
+import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory
+import org.springframework.kafka.core.ConsumerFactory
+import org.springframework.kafka.core.DefaultKafkaConsumerFactory
+import com.ireland.ager.chat.config.KafkaConstants
+import org.springframework.kafka.core.ProducerFactory
+import org.springframework.kafka.core.DefaultKafkaProducerFactory
+import org.springframework.kafka.core.KafkaTemplate
+import lombok.extern.slf4j.Slf4j
+import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker
+import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer
+import org.springframework.web.socket.config.annotation.StompEndpointRegistry
+import org.springframework.messaging.simp.config.MessageBrokerRegistry
+import com.ireland.ager.config.BaseEntity
+import javax.persistence.GeneratedValue
+import javax.persistence.GenerationType
+import javax.persistence.JoinColumn
+import org.hibernate.annotations.DynamicUpdate
+import javax.persistence.Enumerated
+import com.ireland.ager.chat.entity.ReviewStatus
+import com.ireland.ager.chat.entity.RoomStatus
+import com.ireland.ager.chat.entity.MessageRoom.MessageRoomBuilder
+import lombok.RequiredArgsConstructor
+import com.ireland.ager.chat.repository.MessageRoomRepository
+import com.ireland.ager.chat.repository.MessageRepository
+import com.ireland.ager.account.service.AccountServiceImpl
+import com.ireland.ager.product.service.ProductServiceImpl
+import com.ireland.ager.account.exception.UnAuthorizedAccessException
+import com.ireland.ager.chat.exception.UnAuthorizedChatException
+import org.springframework.messaging.simp.SimpMessagingTemplate
+import com.ireland.ager.chat.service.MessageService
+import org.springframework.kafka.annotation.KafkaListener
+import com.ireland.ager.chat.service.KafkaConsumerService
+import org.springframework.web.bind.annotation.CrossOrigin
+import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.RequestMapping
+import com.ireland.ager.chat.service.KafkaProductService
+import org.springframework.web.bind.annotation.PostMapping
+import io.swagger.annotations.ApiOperation
+import io.swagger.annotations.ApiParam
+import org.springframework.messaging.handler.annotation.MessageMapping
+import org.springframework.messaging.handler.annotation.SendTo
+import org.springframework.messaging.handler.annotation.DestinationVariable
+import com.ireland.ager.main.common.service.ResponseService
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.http.ResponseEntity
+import com.ireland.ager.main.common.SliceResult
+import org.springframework.web.bind.annotation.PathVariable
+import com.ireland.ager.main.common.SingleResult
+import org.springframework.web.bind.annotation.DeleteMapping
+import com.ireland.ager.main.common.CommonResult
+import org.springframework.data.jpa.repository.JpaRepository
+import com.ireland.ager.chat.repository.MessageRepositoryCustom
+import com.querydsl.jpa.impl.JPAQueryFactory
+import com.ireland.ager.chat.entity.QMessage
+import org.springframework.data.domain.SliceImpl
+import com.ireland.ager.chat.repository.MessageRoomRepositoryCustom
+import com.ireland.ager.chat.entity.QMessageRoom
+import com.ireland.ager.main.common.ListResult
+import com.ireland.ager.main.common.CommonResponse
+import lombok.AllArgsConstructor
+import com.ireland.ager.main.entity.Search
+import com.ireland.ager.main.entity.Search.SearchBuilder
+import org.springframework.data.redis.core.RedisTemplate
+import com.ireland.ager.main.repository.SearchRepository
+import org.springframework.data.redis.core.ListOperations
+import com.ireland.ager.main.service.SearchService
+import org.springframework.cache.annotation.CacheEvict
+import com.amazonaws.services.s3.AmazonS3Client
+import kotlin.Throws
+import com.amazonaws.AmazonServiceException
+import com.ireland.ager.product.entity.Url
+import com.ireland.ager.main.service.UploadServiceImpl
+import com.ireland.ager.board.entity.BoardUrl
+import org.springframework.web.multipart.MultipartFile
+import com.ireland.ager.product.exception.InvaildFileExtensionException
+import com.amazonaws.services.s3.model.ObjectMetadata
+import com.amazonaws.services.s3.transfer.TransferManager
+import com.amazonaws.services.s3.model.PutObjectRequest
+import com.amazonaws.services.s3.transfer.Upload
+import net.coobird.thumbnailator.Thumbnails
+import com.ireland.ager.board.service.BoardServiceImpl
+import org.springframework.web.bind.annotation.RequestParam
+import com.ireland.ager.product.dto.response.ProductThumbResponse
+import com.ireland.ager.board.dto.response.BoardSummaryResponse
+import com.ireland.ager.main.repository.SearchRepositoryCustom
+import com.ireland.ager.main.entity.QSearch
+import com.ireland.ager.board.entity.Board
+import com.ireland.ager.board.dto.request.BoardRequest
+import com.ireland.ager.board.dto.request.CommentRequest
+import com.ireland.ager.board.dto.response.BoardResponse
+import com.ireland.ager.board.dto.response.CommentResponse
+import javax.persistence.FetchType
+import com.ireland.ager.board.entity.Board.BoardBuilder
+import com.ireland.ager.board.entity.Comment.CommentBuilder
+import com.ireland.ager.board.entity.BoardUrl.BoardUrlBuilder
+import com.ireland.ager.board.repository.BoardRepository
+import org.springframework.data.redis.core.ValueOperations
+import com.ireland.ager.product.exception.InvaildUploadException
+import org.springframework.validation.BindingResult
+import org.springframework.validation.ObjectError
+import com.ireland.ager.board.exception.InvalidBoardTitleException
+import com.ireland.ager.board.exception.InvalidBoardDetailException
+import com.ireland.ager.board.repository.CommentRepository
+import org.springframework.web.bind.annotation.RequestPart
+import javax.validation.Valid
+import org.springframework.web.bind.annotation.PatchMapping
+import com.ireland.ager.board.service.CommentServiceImpl
+import com.ireland.ager.board.repository.BoardRepositoryCustom
+import com.ireland.ager.board.repository.CommentRepositoryCustom
+import com.querydsl.jpa.impl.JPAQuery
+import com.ireland.ager.board.entity.QBoard
+import com.querydsl.core.types.dsl.PathBuilder
+import com.querydsl.core.types.OrderSpecifier
+import com.ireland.ager.board.entity.QComment
+import com.ireland.ager.board.entity.QBoardUrl
+import com.querydsl.core.types.dsl.BooleanExpression
+import com.ireland.ager.product.entity.QProduct
+import com.ireland.ager.trade.entity.Trade
+import com.ireland.ager.trade.entity.Trade.TradeBuilder
+import com.ireland.ager.product.repository.ProductRepository
+import com.ireland.ager.trade.repository.TradeRepository
+import com.ireland.ager.product.entity.ProductStatus
+import com.ireland.ager.trade.service.TradeServiceImpl
+import com.ireland.ager.trade.repository.TradeRepositoryCustom
+import com.ireland.ager.trade.entity.QTrade
+import org.springframework.web.servlet.HandlerInterceptor
+import com.ireland.ager.account.service.AuthServiceImpl
+import javax.servlet.http.HttpServletRequest
+import javax.servlet.http.HttpServletResponse
+import com.ireland.ager.config.interceptor.KakaoAuthenticationInterceptor
+import org.springframework.util.PatternMatchUtils
+import javax.persistence.EntityListeners
+import org.springframework.data.jpa.domain.support.AuditingEntityListener
+import org.springframework.data.annotation.CreatedDate
+import com.fasterxml.jackson.databind.annotation.JsonSerialize
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer
+import org.springframework.data.annotation.LastModifiedDate
+import org.springframework.cache.annotation.CachingConfigurerSupport
+import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory
+import org.springframework.data.redis.connection.lettuce.LettuceClientConfiguration
+import org.springframework.data.redis.connection.RedisStandaloneConfiguration
+import org.springframework.data.redis.serializer.StringRedisSerializer
+import org.springframework.cache.CacheManager
+import org.springframework.data.redis.cache.RedisCacheManager.RedisCacheManagerBuilder
+import org.springframework.data.redis.cache.RedisCacheManager
+import springfox.documentation.spring.web.plugins.Docket
+import springfox.documentation.spi.DocumentationType
+import springfox.documentation.builders.RequestHandlerSelectors
+import springfox.documentation.builders.PathSelectors
+import javax.persistence.EntityManager
+import org.springframework.web.bind.annotation.RestControllerAdvice
+import com.ireland.ager.account.exception.ExpiredAccessTokenException
+import com.ireland.ager.config.ExceptionAdvice
+import com.ireland.ager.product.exception.InvaildDataException
+import com.ireland.ager.main.exception.IntenalServerErrorException
+import com.ireland.ager.account.exception.UnAuthorizedTokenException
+import com.ireland.ager.account.exception.NotFoundTokenException
+import com.ireland.ager.product.exception.InvaildFormException
+import com.ireland.ager.product.exception.InvaildProductTitleException
+import com.ireland.ager.product.exception.InvaildProductPriceException
+import com.ireland.ager.product.exception.InvaildProductDetailException
+import com.ireland.ager.product.exception.InvaildProductCategoryException
+import com.ireland.ager.product.exception.InvaildProductStatusException
+import com.ireland.ager.review.exception.DuplicateReviewException
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
+import org.springframework.security.config.annotation.web.builders.HttpSecurity
+import org.springframework.web.cors.CorsConfiguration
+import org.springframework.security.config.annotation.web.builders.WebSecurity
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry
+import com.ireland.ager.review.dto.request.ReviewRequest
+import com.ireland.ager.review.entity.Review
+import com.ireland.ager.review.dto.response.ReviewResponse
+import com.ireland.ager.review.dto.response.ReviewResponse.ReviewResponseBuilder
+import com.ireland.ager.review.entity.Review.ReviewBuilder
+import com.ireland.ager.review.repository.ReviewRepository
+import com.ireland.ager.review.service.ReviewServiceImpl
+import com.ireland.ager.review.repository.ReviewRepositoryCustom
+import com.ireland.ager.review.entity.QReview
+import com.ireland.ager.account.dto.request.AccountUpdateRequest
+import com.ireland.ager.account.dto.response.KakaoResponse.KakaoAccount
+import com.ireland.ager.account.dto.response.KakaoResponse
+import com.ireland.ager.account.dto.response.MyAccountResponse
+import com.ireland.ager.account.dto.response.MyAccountResponse.MyAccountResponseBuilder
+import com.ireland.ager.account.dto.response.OtherAccountResponse
+import com.ireland.ager.account.dto.response.OtherAccountResponse.OtherAccountResponseBuilder
+import com.ireland.ager.account.repository.AccountRepository
+import org.springframework.util.MultiValueMap
+import org.springframework.web.client.RestTemplate
+import org.springframework.util.LinkedMultiValueMap
+import org.springframework.web.client.HttpClientErrorException
+import com.ireland.ager.account.service.AccountInfoServiceImpl
+import com.ireland.ager.product.dto.request.ProductRequest
+import com.ireland.ager.product.dto.request.ProductUpdateRequest
+import com.ireland.ager.product.dto.response.ProductResponse
+import com.ireland.ager.product.dto.response.ProductResponse.ProductResponseBuilder
+import com.ireland.ager.product.dto.response.ProductThumbResponse.ProductThumbResponseBuilder
+import com.ireland.ager.product.entity.Url.UrlBuilder
+import com.ireland.ager.product.entity.Product.ProductBuilder
+import com.ireland.ager.product.repository.ProductRepositoryCustom
+import com.ireland.ager.product.entity.QUrl
+import org.springframework.boot.autoconfigure.SpringBootApplication
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing
+import org.springframework.cache.annotation.EnableCaching
+import org.springframework.scheduling.annotation.EnableScheduling
+import org.springframework.security.web.firewall.HttpFirewall
+import org.springframework.security.web.firewall.StrictHttpFirewall
+import kotlin.jvm.JvmStatic
+import org.springframework.boot.SpringApplication
+import com.ireland.ager.AgerProjectApplication
+import java.time.LocalDateTime
+import java.util.ArrayList
+
+/**
+ * @Class : ReviewResponse
+ * @Description : 리뷰 도메인에 대한 Response DTO
+ */
+class ReviewResponse internal constructor(
+    var buyerId: Long?,
+    var buyerName: String?,
+    var comment: String?,
+    var sellerId: Long?,
+    var sellerNickname: String?,
+    var stars: Int,
+    var createdAt: LocalDateTime?
+) {
+
+    override fun equals(o: Any?): Boolean {
+        if (o === this) return true
+        if (o !is ReviewResponse) return false
+        val other = o
+        if (!other.canEqual(this as Any)) return false
+        val `this$buyerId`: Any? = buyerId
+        val `other$buyerId`: Any? = other.buyerId
+        if (if (`this$buyerId` == null) `other$buyerId` != null else `this$buyerId` != `other$buyerId`) return false
+        val `this$buyerName`: Any? = buyerName
+        val `other$buyerName`: Any? = other.buyerName
+        if (if (`this$buyerName` == null) `other$buyerName` != null else `this$buyerName` != `other$buyerName`) return false
+        val `this$comment`: Any? = comment
+        val `other$comment`: Any? = other.comment
+        if (if (`this$comment` == null) `other$comment` != null else `this$comment` != `other$comment`) return false
+        val `this$sellerId`: Any? = sellerId
+        val `other$sellerId`: Any? = other.sellerId
+        if (if (`this$sellerId` == null) `other$sellerId` != null else `this$sellerId` != `other$sellerId`) return false
+        val `this$sellerNickname`: Any? = sellerNickname
+        val `other$sellerNickname`: Any? = other.sellerNickname
+        if (if (`this$sellerNickname` == null) `other$sellerNickname` != null else `this$sellerNickname` != `other$sellerNickname`) return false
+        if (stars != other.stars) return false
+        val `this$createdAt`: Any? = createdAt
+        val `other$createdAt`: Any? = other.createdAt
+        return if (if (`this$createdAt` == null) `other$createdAt` != null else `this$createdAt` != `other$createdAt`) false else true
+    }
+
+    protected fun canEqual(other: Any?): Boolean {
+        return other is ReviewResponse
+    }
+
+    override fun hashCode(): Int {
+        val PRIME = 59
+        var result = 1
+        val `$buyerId`: Any? = buyerId
+        result = result * PRIME + (`$buyerId`?.hashCode() ?: 43)
+        val `$buyerName`: Any? = buyerName
+        result = result * PRIME + (`$buyerName`?.hashCode() ?: 43)
+        val `$comment`: Any? = comment
+        result = result * PRIME + (`$comment`?.hashCode() ?: 43)
+        val `$sellerId`: Any? = sellerId
+        result = result * PRIME + (`$sellerId`?.hashCode() ?: 43)
+        val `$sellerNickname`: Any? = sellerNickname
+        result = result * PRIME + (`$sellerNickname`?.hashCode() ?: 43)
+        result = result * PRIME + stars
+        val `$createdAt`: Any? = createdAt
+        result = result * PRIME + (`$createdAt`?.hashCode() ?: 43)
+        return result
+    }
+
+    override fun toString(): String {
+        return "ReviewResponse(buyerId=" + buyerId + ", buyerName=" + buyerName + ", comment=" + comment + ", sellerId=" + sellerId + ", sellerNickname=" + sellerNickname + ", stars=" + stars + ", createdAt=" + createdAt + ")"
+    }
+
+    class ReviewResponseBuilder internal constructor() {
+        private var buyerId: Long? = null
+        private var buyerName: String? = null
+        private var comment: String? = null
+        private var sellerId: Long? = null
+        private var sellerNickname: String? = null
+        private var stars = 0
+        private var createdAt: LocalDateTime? = null
+        fun buyerId(buyerId: Long?): ReviewResponseBuilder {
+            this.buyerId = buyerId
+            return this
+        }
+
+        fun buyerName(buyerName: String?): ReviewResponseBuilder {
+            this.buyerName = buyerName
+            return this
+        }
+
+        fun comment(comment: String?): ReviewResponseBuilder {
+            this.comment = comment
+            return this
+        }
+
+        fun sellerId(sellerId: Long?): ReviewResponseBuilder {
+            this.sellerId = sellerId
+            return this
+        }
+
+        fun sellerNickname(sellerNickname: String?): ReviewResponseBuilder {
+            this.sellerNickname = sellerNickname
+            return this
+        }
+
+        fun stars(stars: Int): ReviewResponseBuilder {
+            this.stars = stars
+            return this
+        }
+
+        fun createdAt(createdAt: LocalDateTime?): ReviewResponseBuilder {
+            this.createdAt = createdAt
+            return this
+        }
+
+        fun build(): ReviewResponse {
+            return ReviewResponse(buyerId, buyerName, comment, sellerId, sellerNickname, stars, createdAt)
+        }
+
+        override fun toString(): String {
+            return "ReviewResponse.ReviewResponseBuilder(buyerId=" + buyerId + ", buyerName=" + buyerName + ", comment=" + comment + ", sellerId=" + sellerId + ", sellerNickname=" + sellerNickname + ", stars=" + stars + ", createdAt=" + createdAt + ")"
+        }
+    }
+
+    companion object {
+        /**
+         * @Method : toReviewResponse
+         * @Description : 리뷰 데이터 응답 객체화
+         * @Parameter : [review]
+         * @Return : ReviewResponse
+         */
+        fun toReviewResponse(review: Review): ReviewResponse {
+            return builder()
+                .buyerName(review.buyerNickname)
+                .buyerId(review.buyerId)
+                .comment(review.comment)
+                .sellerNickname(review.sellerNickname)
+                .sellerId(review.sellerId.accountId)
+                .stars(review.stars)
+                .createdAt(review.createdAt)
+                .build()
+        }
+
+        fun toReviewResponse(reviewList: List<Review>): List<ReviewResponse> {
+            val reviewResponseList: MutableList<ReviewResponse> = ArrayList()
+            for (review in reviewList) {
+                val reviewResponse = toReviewResponse(review)
+                reviewResponseList.add(reviewResponse)
+            }
+            return reviewResponseList
+        }
+
+        fun builder(): ReviewResponseBuilder {
+            return ReviewResponseBuilder()
+        }
+    }
+}

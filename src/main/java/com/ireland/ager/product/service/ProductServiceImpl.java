@@ -28,10 +28,10 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.transaction.Transactional;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.*;
@@ -61,6 +61,7 @@ public class ProductServiceImpl {
      * @Parameter : [category, keyword, pageable]
      * @Return : Slice<ProductThumbResponse>
      **/
+    @Transactional(readOnly = true)
     public Slice<ProductThumbResponse> findProductAllByCreatedAtDesc(Category category, String keyword, Pageable pageable) {
         if(!isStringEmpty(keyword)) searchRepository.save(new Search(keyword));
         return productRepository.findAllProductPageableOrderByCreatedAtDesc(category, keyword, pageable);

@@ -38,6 +38,7 @@ out/
 
 application-local.yml
 application-test.yml
+application.yml
 .gitsecret/keys/random_seed
 !*.secret
 *.DS_Store

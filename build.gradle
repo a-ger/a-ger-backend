@@ -39,7 +39,7 @@ dependencies {
 	implementation 'org.springframework.kafka:spring-kafka'
 	testImplementation 'org.springframework.kafka:spring-kafka-test'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	implementation 'org.postgresql:postgresql'
+	runtimeOnly 'mysql:mysql-connector-java'
 	//자바 역직렬화 문제 해결 패키지
 	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 	implementation 'com.fasterxml.jackson.core:jackson-databind'

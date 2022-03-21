@@ -104,3 +104,240 @@ The used trading platform for student who living in Ireland🍀
   - 구매자는 거래 완료 이후 판매자를 평가할 수 있다.
 - 관리자
   - 관리자는 불건전한 판매자를 관리할 수 있다.
+ 
+ ### 파일 디렉토리
+ 
+<details>
+<summary>토글 접기/펼치기</summary>
+<div markdown="1">
+
+```java
+├── Dockerfile
+├── README.md
+├── ager-uml.png
+├── build
+│   ├── generated
+│   │   └── source
+│   │       └── kaptKotlin
+│   │           ├── main
+│   │           └── test
+│   └── tmp
+│       └── kapt3
+│           ├── incApCache
+│           │   ├── main
+│           │   ├── querydsl
+│           │   └── test
+│           └── stubs
+│               ├── main
+│               └── test
+├── build.gradle
+├── gradle
+│   └── wrapper
+│       ├── gradle-wrapper.jar
+│       └── gradle-wrapper.properties
+├── gradlew
+├── gradlew.bat
+├── settings.gradle
+└── src
+    ├── main
+    │   ├── java
+    │   │   └── com
+    │   │       └── ireland
+    │   │           └── ager
+    │   │               ├── AgerProjectApplication.java
+    │   │               ├── account
+    │   │               │   ├── controller
+    │   │               │   │   ├── AccountController.java
+    │   │               │   │   └── InfoController.java
+    │   │               │   ├── dto
+    │   │               │   │   ├── request
+    │   │               │   │   │   └── AccountUpdateRequest.java
+    │   │               │   │   └── response
+    │   │               │   │       ├── KakaoResponse.java
+    │   │               │   │       ├── MyAccountResponse.java
+    │   │               │   │       └── OtherAccountResponse.java
+    │   │               │   ├── entity
+    │   │               │   │   └── Account.java
+    │   │               │   ├── exception
+    │   │               │   │   ├── ExpiredAccessTokenException.java
+    │   │               │   │   ├── NotFoundTokenException.java
+    │   │               │   │   ├── UnAuthorizedAccessException.java
+    │   │               │   │   └── UnAuthorizedTokenException.java
+    │   │               │   ├── repository
+    │   │               │   │   └── AccountRepository.java
+    │   │               │   └── service
+    │   │               │       ├── AccountInfoServiceImpl.java
+    │   │               │       ├── AccountServiceImpl.java
+    │   │               │       └── AuthServiceImpl.java
+    │   │               ├── board
+    │   │               │   ├── controller
+    │   │               │   │   ├── BoardController.java
+    │   │               │   │   └── CommentController.java
+    │   │               │   ├── dto
+    │   │               │   │   ├── request
+    │   │               │   │   │   ├── BoardRequest.java
+    │   │               │   │   │   └── CommentRequest.java
+    │   │               │   │   └── response
+    │   │               │   │       ├── BoardResponse.java
+    │   │               │   │       ├── BoardSummaryResponse.java
+    │   │               │   │       └── CommentResponse.java
+    │   │               │   ├── entity
+    │   │               │   │   ├── Board.java
+    │   │               │   │   ├── BoardUrl.java
+    │   │               │   │   └── Comment.java
+    │   │               │   ├── exception
+    │   │               │   │   ├── InvalidBoardDetailException.java
+    │   │               │   │   └── InvalidBoardTitleException.java
+    │   │               │   ├── repository
+    │   │               │   │   ├── BoardRepository.java
+    │   │               │   │   ├── BoardRepositoryCustom.java
+    │   │               │   │   ├── BoardRepositoryImpl.java
+    │   │               │   │   ├── CommentRepository.java
+    │   │               │   │   ├── CommentRepositoryCustom.java
+    │   │               │   │   └── CommentRepositoryImpl.java
+    │   │               │   └── service
+    │   │               │       ├── BoardServiceImpl.java
+    │   │               │       └── CommentServiceImpl.java
+    │   │               ├── chat
+    │   │               │   ├── config
+    │   │               │   │   ├── KafkaConstants.java
+    │   │               │   │   ├── ListenerConfig.java
+    │   │               │   │   ├── ProducerConfig.java
+    │   │               │   │   └── WebSocketConfig.java
+    │   │               │   ├── controller
+    │   │               │   │   ├── MessageController.java
+    │   │               │   │   └── MessageRoomController.java
+    │   │               │   ├── dto
+    │   │               │   │   ├── request
+    │   │               │   │   │   └── MessageRequest.java
+    │   │               │   │   └── response
+    │   │               │   │       ├── MessageDetailsResponse.java
+    │   │               │   │       ├── MessageSummaryResponse.java
+    │   │               │   │       └── RoomCreateResponse.java
+    │   │               │   ├── entity
+    │   │               │   │   ├── Message.java
+    │   │               │   │   ├── MessageRoom.java
+    │   │               │   │   ├── ReviewStatus.java
+    │   │               │   │   └── RoomStatus.java
+    │   │               │   ├── exception
+    │   │               │   │   └── UnAuthorizedChatException.java
+    │   │               │   ├── repository
+    │   │               │   │   ├── MessageRepository.java
+    │   │               │   │   ├── MessageRepositoryCustom.java
+    │   │               │   │   ├── MessageRepositoryImpl.java
+    │   │               │   │   ├── MessageRoomRepository.java
+    │   │               │   │   ├── MessageRoomRepositoryCustom.java
+    │   │               │   │   └── MessageRoomRepositoryImpl.java
+    │   │               │   └── service
+    │   │               │       ├── KafkaConsumerService.java
+    │   │               │       ├── KafkaProductService.java
+    │   │               │       └── MessageService.java
+    │   │               ├── config
+    │   │               │   ├── BaseEntity.java
+    │   │               │   ├── ExceptionAdvice.java
+    │   │               │   ├── KakaoAuthenticationConfig.java
+    │   │               │   ├── QuerydslConfig.java
+    │   │               │   ├── RedisConfig.java
+    │   │               │   ├── SwaggerConfig.java
+    │   │               │   ├── WebSecurityConfig.java
+    │   │               │   └── interceptor
+    │   │               │       └── KakaoAuthenticationInterceptor.java
+    │   │               ├── main
+    │   │               │   ├── common
+    │   │               │   │   ├── CommonResponse.java
+    │   │               │   │   ├── CommonResult.java
+    │   │               │   │   ├── ListResult.java
+    │   │               │   │   ├── SingleResult.java
+    │   │               │   │   ├── SliceResult.java
+    │   │               │   │   └── service
+    │   │               │   │       └── ResponseService.java
+    │   │               │   ├── controller
+    │   │               │   │   └── MainController.java
+    │   │               │   ├── entity
+    │   │               │   │   └── Search.java
+    │   │               │   ├── exception
+    │   │               │   │   ├── IntenalServerErrorException.java
+    │   │               │   │   └── NotFoundException.java
+    │   │               │   ├── repository
+    │   │               │   │   ├── SearchRepository.java
+    │   │               │   │   ├── SearchRepositoryCustom.java
+    │   │               │   │   └── SearchRepositoryImpl.java
+    │   │               │   └── service
+    │   │               │       ├── SearchService.java
+    │   │               │       └── UploadServiceImpl.java
+    │   │               ├── product
+    │   │               │   ├── controller
+    │   │               │   │   └── ProductController.java
+    │   │               │   ├── dto
+    │   │               │   │   ├── request
+    │   │               │   │   │   ├── ProductRequest.java
+    │   │               │   │   │   └── ProductUpdateRequest.java
+    │   │               │   │   └── response
+    │   │               │   │       ├── ProductResponse.java
+    │   │               │   │       └── ProductThumbResponse.java
+    │   │               │   ├── entity
+    │   │               │   │   ├── Category.java
+    │   │               │   │   ├── Product.java
+    │   │               │   │   ├── ProductStatus.java
+    │   │               │   │   └── Url.java
+    │   │               │   ├── exception
+    │   │               │   │   ├── InvaildDataException.java
+    │   │               │   │   ├── InvaildFileExtensionException.java
+    │   │               │   │   ├── InvaildFormException.java
+    │   │               │   │   ├── InvaildProductCategoryException.java
+    │   │               │   │   ├── InvaildProductDetailException.java
+    │   │               │   │   ├── InvaildProductPriceException.java
+    │   │               │   │   ├── InvaildProductStatusException.java
+    │   │               │   │   ├── InvaildProductTitleException.java
+    │   │               │   │   └── InvaildUploadException.java
+    │   │               │   ├── repository
+    │   │               │   │   ├── ProductRepository.java
+    │   │               │   │   ├── ProductRepositoryCustom.java
+    │   │               │   │   ├── ProductRepositoryImpl.java
+    │   │               │   │   └── UrlRepository.java
+    │   │               │   └── service
+    │   │               │       └── ProductServiceImpl.java
+    │   │               ├── review
+    │   │               │   ├── controller
+    │   │               │   │   └── ReviewController.java
+    │   │               │   ├── dto
+    │   │               │   │   ├── request
+    │   │               │   │   │   └── ReviewRequest.java
+    │   │               │   │   └── response
+    │   │               │   │       └── ReviewResponse.java
+    │   │               │   ├── entity
+    │   │               │   │   └── Review.java
+    │   │               │   ├── exception
+    │   │               │   │   └── DuplicateReviewException.java
+    │   │               │   ├── repository
+    │   │               │   │   ├── ReviewRepository.java
+    │   │               │   │   ├── ReviewRepositoryCustom.java
+    │   │               │   │   └── ReviewRepositoryImpl.java
+    │   │               │   └── service
+    │   │               │       └── ReviewServiceImpl.java
+    │   │               └── trade
+    │   │                   ├── controller
+    │   │                   │   └── TradeController.java
+    │   │                   ├── entity
+    │   │                   │   └── Trade.java
+    │   │                   ├── repository
+    │   │                   │   ├── TradeRepository.java
+    │   │                   │   ├── TradeRepositoryCustom.java
+    │   │                   │   └── TradeRepositoryImpl.java
+    │   │                   └── service
+    │   │                       └── TradeServiceImpl.java
+    │   └── resources
+    │       ├── application-local.yml
+    │       ├── banner.txt
+    │       └── logback-spring.xml
+    └── test
+        └── java
+            └── com
+                └── ireland
+
+89 directories, 133 files
+```
+
+
+</div>
+</details>

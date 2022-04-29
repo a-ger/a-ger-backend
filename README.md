@@ -11,7 +11,7 @@ The used trading platform for student who living in Ireland🍀
 ------
 - 아일랜드 중고 거래 플랫폼 제작
 - AWS를 사용한 배포 및 운영
-- TDD, DDD 기반 개발
+- DDD 기반 개발
 ------
 ### 🙋‍♂️ 팀원
 ------
